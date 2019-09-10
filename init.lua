@@ -1,10 +1,46 @@
 local playerLastPos = {}
 local playerRenamePos = {}
+local lastNotification = {} --THis is used to avoid spamming
+
+local function get_seconds_since_last_notification(string)
+    if(lastNotification[string]) then 
+        return ((minetest.get_us_time() - lastNotification[string])/1000000.0) 
+    else 
+        return 60 --This is a arbitriaty large number
+    end
+end
+
+--This might be slightly more efficient if run as a "different pos instead"
+local function samePos(pos1,pos2)
+    return pos1.x == pos2.x and pos1.z == pos2.z and pos1.y == pos2.y
+end
+
+local function get_rename_formspec(name)
+    local formspec = {
+        "size[3,2]",
+        "real_coordinates[true]",
+        "field[0.5,0.5;2.5,1;name;Name;" .. minetest.formspec_escape(name) .. "]",
+        "button_exit[1,1.5;1,1;rename;Rename]"
+    }
+    -- table.concat is faster than string concatenation - `..`
+    return table.concat(formspec, "")
+end
+
+local function playerEnterEvent(player, pos)
+    local meta = minetest.get_meta(pos)
+    local messageString = player:get_player_name() .. " entered " .. meta:get_string("name") .. " at " .. "x:" .. pos.x .. " y:" ..pos.y .. " z:" .. pos.z
+    local secondsSinceLast = get_seconds_since_last_notification(messageString)
+    if(secondsSinceLast > 10) then 
+        minetest.chat_send_player(meta:get_string("owner"), messageString) 
+        lastNotification[messageString] = minetest.get_us_time()
+    end
+
+end
 
 minetest.register_node("block_alert:notifier",
 {
     description = "notifier block.",
-    tiles = {"^[colorize:#802BB1"}, 
+    tiles = {"^[colorize:#802BB1"},
 
     after_place_node  = function(pos, placer)
         local meta = minetest.get_meta(pos)
@@ -18,7 +54,6 @@ minetest.register_node("block_alert:notifier",
         --todo add permission check
         local pname = clicker and clicker:get_player_name() or ""
         local meta = minetest.get_meta(pos)
-        minetest.chat_send_all(meta:get_string("owner"))
         if(meta:get_string("owner") == pname) then 
             playerRenamePos[pname] = pos
             minetest.show_formspec(pname, "block_alert:rename", get_rename_formspec(meta:get_string("name")))            
@@ -27,7 +62,7 @@ minetest.register_node("block_alert:notifier",
 })
 
 
-minetest.debug("Jukealert initialised")
+minetest.debug("Block_alert initialised")
 
 --This can be made muchhhhhh more efficient
 minetest.register_globalstep(function(dtime)
@@ -58,37 +93,3 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
         end
     end
 end)
-
-function playerEnterEvent(player, pos)
-    local notifierName = minetest.get_meta(pos):get_string("name")
-    minetest.chat_send_all(player:get_player_name() .. " entered " .. notifierName .. " at " .. "x:" .. pos.x .. " y:" ..pos.y .. " z:" .. pos.z)
-end
-
---This might be slightly more efficient if run as a "different pos instead"
- function samePos(pos1,pos2)
-    return pos1.x == pos2.x and pos1.z == pos2.z and pos1.y == pos2.y
-end
-
-function get_rename_formspec(name)
-    local formspec = {
-        "size[3,2]",
-        "real_coordinates[true]",
-        "field[0.5,0.5;2.5,1;name;Name;" .. minetest.formspec_escape(name) .. "]",
-        "button_exit[1,1.5;1,1;rename;Rename]"
-    }
-    -- table.concat is faster than string concatenation - `..`
-    return table.concat(formspec, "")
-end
-
-function dump(o)
-    if type(o) == 'table' then
-       local s = '{ '
-       for k,v in pairs(o) do
-          if type(k) ~= 'number' then k = '"'..k..'"' end
-          s = s .. '['..k..'] = ' .. dump(v) .. ','
-       end
-       return s .. '} '
-    else
-       return tostring(o)
-    end
- end
