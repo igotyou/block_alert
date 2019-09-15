@@ -22,19 +22,30 @@ local function get_rename_formspec(name)
         "field[0.5,0.5;2.5,1;name;Name;" .. minetest.formspec_escape(name) .. "]",
         "button_exit[1,1.5;1,1;rename;Rename]"
     }
-    -- table.concat is faster than string concatenation - `..`
     return table.concat(formspec, "")
 end
 
 local function playerEnterEvent(player, pos)
-    local meta = minetest.get_meta(pos)
-    local messageString = player:get_player_name() .. " entered " .. meta:get_string("name") .. " at " .. "x:" .. pos.x .. " y:" ..pos.y .. " z:" .. pos.z
-    local secondsSinceLast = get_seconds_since_last_notification(messageString)
-    if(secondsSinceLast > 10) then 
-        minetest.chat_send_player(meta:get_string("owner"), messageString) 
-        lastNotification[messageString] = minetest.get_us_time()
+    local reinf = ct.get_reinforcement(pos)
+    if reinf then
+        local meta = minetest.get_meta(pos)
+        local messageString = player:get_player_name() .. " entered " .. meta:get_string("name") .. " at " .. "x:" .. pos.x .. " y:" ..pos.y .. " z:" .. pos.z
+        local secondsSinceLast = get_seconds_since_last_notification(messageString)
+        if(secondsSinceLast > 10) then 
+            pm.send_chat_group(reinf.ctgroup_id, messageString)
+            lastNotification[messageString] = minetest.get_us_time()
+        end
     end
+end
 
+local function checkPermission(pos, pname)
+    local reinf = ct.get_reinforcement(pos)
+    if reinf then
+        local player_id = pm.get_player_by_name(pname).id
+        if get_player_group(player_id, reinf.ctgroup_id) then return true else return false end
+    else return true
+    end
+    return false
 end
 
 minetest.register_node("block_alert:notifier",
@@ -44,9 +55,7 @@ minetest.register_node("block_alert:notifier",
 
     after_place_node  = function(pos, placer)
         local meta = minetest.get_meta(pos)
-        local pname = placer and placer:get_player_name() or ""
-        meta:mark_as_private("owner")
-        meta:set_string("owner", pname)
+        meta:mark_as_private("name")
         meta:set_string("name", "Notifier")
     end,
 
@@ -54,7 +63,7 @@ minetest.register_node("block_alert:notifier",
         --todo add permission check
         local pname = clicker and clicker:get_player_name() or ""
         local meta = minetest.get_meta(pos)
-        if(meta:get_string("owner") == pname) then 
+        if(checkPermission(pos,pname)) then 
             playerRenamePos[pname] = pos
             minetest.show_formspec(pname, "block_alert:rename", get_rename_formspec(meta:get_string("name")))            
         end
@@ -88,7 +97,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
     if fields.name then
         local pname = player and player:get_player_name() or ""
         local meta = minetest.get_meta(playerRenamePos[pname])
-        if(meta:get_string("owner") == pname) then
+        if(checkPermission(playerRenamePos[pname],pname)) then
             meta:set_string("name", fields.name) 
         end
     end
