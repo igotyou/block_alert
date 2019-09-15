@@ -1,5 +1,3 @@
-local notfier = nil
-
 local lastNotification = {} --This is used to avoid spamming
 
 local function get_seconds_since_last_notification(string)
@@ -32,5 +30,3 @@ function notifier.handle_player_entry(player, pos)
         end
     end
 end
-
-return notifier

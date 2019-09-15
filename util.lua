@@ -1,5 +1,3 @@
-local util = nil
-
 function util.check_permission(pos, pname)
     local reinf = ct.get_reinforcement(pos)
     if reinf then
@@ -17,5 +15,3 @@ function util.different_pos(pos1,pos2)
     else return false
     end
 end
-
-return util
