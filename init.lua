@@ -42,7 +42,7 @@ local function checkPermission(pos, pname)
     local reinf = ct.get_reinforcement(pos)
     if reinf then
         local player_id = pm.get_player_by_name(pname).id
-        if get_player_group(player_id, reinf.ctgroup_id) then return true else return false end
+        if pm.get_player_group(player_id, reinf.ctgroup_id) then return true else return false end
     else return true
     end
     return false
