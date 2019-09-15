@@ -23,6 +23,43 @@ minetest.register_node("block_alert:notifier",
     end,
 })
 
+minetest.register_node("block_alert:recorder",
+{
+    description = "Recorder block.",
+    tiles = {"^[colorize:#0000FF"},
+
+    after_place_node  = function(pos, placer)
+        local meta = minetest.get_meta(pos)
+        meta:mark_as_private("name")
+        meta:mark_as_private("log")
+        meta:set_string("name", "Recorder")
+    end,
+
+    on_rightclick = function(pos, node, clicker, itemstack, pointed_thing)
+        --todo add permission check
+        local pname = clicker and clicker:get_player_name() or ""
+        local meta = minetest.get_meta(pos)
+        if(util.check_permission(pos,pname)) then 
+            playerRenamePos[pname] = pos
+            minetest.show_formspec(pname, "block_alert:rename", notifier.get_rename_formspec(meta:get_string("name")))            
+        end
+    end,
+})
+
+minetest.register_on_player_receive_fields(function(player, formname, fields)
+    if formname ~= "block_alert:rename" then
+        return
+    end
+
+    if fields.name then
+        local pname = player and player:get_player_name() or ""
+        local meta = minetest.get_meta(playerRenamePos[pname])
+        if(util.check_permission(playerRenamePos[pname],pname)) then
+            meta:set_string("name", fields.name) 
+        end
+    end
+end)
+
 --This can be made muchhhhhh more efficient
 minetest.register_globalstep(function(dtime)
     for _,player in ipairs(minetest.get_connected_players()) do
@@ -39,16 +76,10 @@ minetest.register_globalstep(function(dtime)
     end
 end)
 
-minetest.register_on_player_receive_fields(function(player, formname, fields)
-    if formname ~= "block_alert:rename" then
-        return
-    end
+minetest.register_on_placenode(function(pos, newnode, placer, oldnode, itemstack, pointed_thing)
+    return false
+end)
 
-    if fields.name then
-        local pname = player and player:get_player_name() or ""
-        local meta = minetest.get_meta(playerRenamePos[pname])
-        if(util.check_permission(playerRenamePos[pname],pname)) then
-            meta:set_string("name", fields.name) 
-        end
-    end
+minetest.register_on_dignode(function(pos, oldnode, digger)
+
 end)

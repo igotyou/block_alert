@@ -22,7 +22,7 @@ function notifier.handle_player_entry(player, pos)
     local reinf = ct.get_reinforcement(pos)
     if reinf then
         local meta = minetest.get_meta(pos)
-        local messageString = player:get_player_name() .. " entered " .. meta:get_string("name") .. " at " .. "x:" .. pos.x .. " y:" ..pos.y .. " z:" .. pos.z
+        local messageString = player:get_player_name() .. " entered " .. meta:get_string("name") .. " at " .. minetest.pos_to_string(pos)
         local secondsSinceLast = get_seconds_since_last_notification(messageString)
         if(secondsSinceLast > 10) then 
             pm.send_chat_group(reinf.ctgroup_id, messageString)
