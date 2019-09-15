@@ -16,7 +16,7 @@ minetest.register_node("block_alert:notifier",
         --todo add permission check
         local pname = clicker and clicker:get_player_name() or ""
         local meta = minetest.get_meta(pos)
-        if(util.checkPermission(pos,pname)) then 
+        if(util.check_permission(pos,pname)) then 
             playerRenamePos[pname] = pos
             minetest.show_formspec(pname, "block_alert:rename", notifier.get_rename_formspec(meta:get_string("name")))            
         end
