@@ -11,8 +11,12 @@ local function get_seconds_since_last_notification(string)
 end
 
 --This might be slightly more efficient if run as a "different pos instead"
-local function samePos(pos1,pos2)
-    return pos1.x == pos2.x and pos1.z == pos2.z and pos1.y == pos2.y
+local function differentPos(pos1,pos2)
+    if pos1.x ~= pos2.x then return true
+    elseif pos1.z ~= pos2.z then return true
+    elseif pos1.y ~= pos2.y then return true
+    else return false
+    end
 end
 
 local function get_rename_formspec(name)
@@ -77,7 +81,7 @@ minetest.debug("Block_alert initialised")
 minetest.register_globalstep(function(dtime)
     for _,player in ipairs(minetest.get_connected_players()) do
         local lastPos = playerLastPos[player:get_player_name()]
-        if(lastPos and not samePos(lastPos, player:get_pos())) then
+        if(lastPos and differentPos(lastPos, player:get_pos())) then
             local bound1 = vector.subtract(player:get_pos(), {x = 5, y=5 , z= 5})
             local bound2 = vector.add(player:get_pos(), {x = 5, y=5 , z= 5})
             local notifierList = minetest.find_nodes_in_area(bound1, bound2, { "block_alert:notifier" })
