@@ -31,8 +31,8 @@ minetest.register_globalstep(function(dtime)
             local bound1 = vector.subtract(player:get_pos(), {x = 5, y=5 , z= 5})
             local bound2 = vector.add(player:get_pos(), {x = 5, y=5 , z= 5})
             local notifierList = minetest.find_nodes_in_area(bound1, bound2, { "block_alert:notifier" })
-            for _,notifier in ipairs(notifierList) do
-                notifier.handle_player_entry(player,notifier)
+            for _,nodeNotifier in ipairs(notifierList) do
+                notifier.handle_player_entry(player,nodeNotifier)
             end
         end
         playerLastPos[player:get_player_name()] = player:get_pos()    
