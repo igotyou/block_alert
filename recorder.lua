@@ -26,9 +26,7 @@ function recorder.get_formspec(recorder_pos)
         table.insert(formspec, ",")
     end
     table.insert(formspec, "]")
-    local returnValue = table.concat(formspec, "")
-    minetest.chat_send_all(returnValue)
-    return returnValue
+    return table.concat(formspec, "")
 end
 
 function recorder.handle_block_event(pos, node_name, player_name, event_type)  
