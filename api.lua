@@ -13,7 +13,6 @@ minetest.register_node("block_alert:notifier",
     end,
 
     on_rightclick = function(pos, node, clicker, itemstack, pointed_thing)
-        --todo add permission check
         local pname = clicker and clicker:get_player_name() or ""
         local meta = minetest.get_meta(pos)
         if(util.check_permission(pos,pname)) then 
@@ -33,16 +32,6 @@ minetest.register_node("block_alert:recorder",
         meta:mark_as_private("name")
         meta:mark_as_private("log")
         meta:set_string("name", "Recorder")
-    end,
-
-    on_rightclick = function(pos, node, clicker, itemstack, pointed_thing)
-        --todo add permission check
-        local pname = clicker and clicker:get_player_name() or ""
-        local meta = minetest.get_meta(pos)
-        if(util.check_permission(pos,pname)) then 
-            playerRenamePos[pname] = pos
-            minetest.show_formspec(pname, "block_alert:rename", notifier.get_rename_formspec(meta:get_string("name")))            
-        end
     end,
 })
 
@@ -65,11 +54,9 @@ minetest.register_globalstep(function(dtime)
     for _,player in ipairs(minetest.get_connected_players()) do
         local lastPos = playerLastPos[player:get_player_name()]
         if(lastPos and util.different_pos(lastPos, player:get_pos())) then
-            local bound1 = vector.subtract(player:get_pos(), {x = 5, y=5 , z= 5})
-            local bound2 = vector.add(player:get_pos(), {x = 5, y=5 , z= 5})
-            local notifierList = minetest.find_nodes_in_area(bound1, bound2, { "block_alert:notifier" })
-            for _,nodeNotifier in ipairs(notifierList) do
-                notifier.handle_player_entry(player,nodeNotifier)
+            local notifierList = util.find_nodes(player:get_pos(), 5, "block_alert:notifier")
+            for _,nodePos in ipairs(notifierList) do
+                notifier.handle_player_entry(player,nodePos)
             end
         end
         playerLastPos[player:get_player_name()] = player:get_pos()    
@@ -77,9 +64,10 @@ minetest.register_globalstep(function(dtime)
 end)
 
 minetest.register_on_placenode(function(pos, newnode, placer, oldnode, itemstack, pointed_thing)
+    if placer and minetest.is_player(placer) then recorder.handle_block_place(pos, newnode.name, placer:get_player_name()) end
     return false
 end)
 
 minetest.register_on_dignode(function(pos, oldnode, digger)
-
+    if digger and minetest.is_player(digger) then recorder.handle_block_place(pos, oldnode.name, digger:get_player_name()) end
 end)

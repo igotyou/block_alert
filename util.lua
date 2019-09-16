@@ -15,3 +15,10 @@ function util.different_pos(pos1,pos2)
     else return false
     end
 end
+
+function util.find_nodes(center_pos, search_radius, block_type)
+    local bound1 = vector.subtract(center_pos, {x = search_radius, y=search_radius , z= search_radius})
+    local bound2 = vector.add(center_pos, {x = search_radius, y=search_radius , z= search_radius})
+    local nodeList = minetest.find_nodes_in_area(bound1, bound2, { block_type })
+    return nodeList
+end
