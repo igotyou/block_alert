@@ -16,16 +16,19 @@ end
 
 function recorder.get_formspec(recorder_pos)
     local log = get_log(recorder_pos)
-    local logString = ""
-    for _,text in pairs(log) do
-        logString = logString .. text .. ","
-    end
     local formspec = {
-        "size[3,8]",
+        "size[10,10]",
         "real_coordinates[true]",
-        "textlist[0.5,0.5;2,7;log;",logString,"]"
+        "textlist[0.5,0.5;9,9;log;"
     }
-    return table.concat(formspec, "")
+    for _,text in pairs(log) do
+        table.insert(formspec, minetest.formspec_escape(text))
+        table.insert(formspec, ",")
+    end
+    table.insert(formspec, "]")
+    local returnValue = table.concat(formspec, "")
+    minetest.chat_send_all(returnValue)
+    return returnValue
 end
 
 function recorder.handle_block_event(pos, node_name, player_name, event_type)  
