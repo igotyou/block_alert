@@ -64,10 +64,10 @@ minetest.register_globalstep(function(dtime)
 end)
 
 minetest.register_on_placenode(function(pos, newnode, placer, oldnode, itemstack, pointed_thing)
-    if placer and minetest.is_player(placer) then recorder.handle_block_place(pos, newnode.name, placer:get_player_name()) end
+    if placer and minetest.is_player(placer) then recorder.handle_block_event(pos, newnode.name, placer:get_player_name(), "placed") end
     return false
 end)
 
 minetest.register_on_dignode(function(pos, oldnode, digger)
-    if digger and minetest.is_player(digger) then recorder.handle_block_place(pos, oldnode.name, digger:get_player_name()) end
+    if digger and minetest.is_player(digger) then recorder.handle_block_event(pos, oldnode.name, digger:get_player_name(), "broke") end
 end)
