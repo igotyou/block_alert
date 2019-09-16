@@ -17,7 +17,7 @@ minetest.register_node("block_alert:notifier",
         local meta = minetest.get_meta(pos)
         if(util.check_permission(pos,pname)) then 
             playerRenamePos[pname] = pos
-            minetest.show_formspec(pname, "block_alert:rename", notifier.get_rename_formspec(meta:get_string("name")))            
+            minetest.show_formspec(pname, "block_alert:notifier_rename", notifier.get_formspec(meta:get_string("name")))            
         end
     end,
 })
@@ -33,10 +33,17 @@ minetest.register_node("block_alert:recorder",
         meta:mark_as_private("log")
         meta:set_string("name", "Recorder")
     end,
+
+    on_rightclick = function(pos, node, clicker, itemstack, pointed_thing)
+        local pname = clicker and clicker:get_player_name() or ""
+        if(util.check_permission(pos,pname)) then
+            minetest.show_formspec(pname, "block_alert:recorder_log", recorder.get_formspec(pos))            
+        end
+    end,
 })
 
 minetest.register_on_player_receive_fields(function(player, formname, fields)
-    if formname ~= "block_alert:rename" then
+    if formname ~= "block_alert:notifier_rename" then
         return
     end
 

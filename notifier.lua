@@ -8,7 +8,7 @@ local function get_seconds_since_last_notification(string)
     end
 end
 
-function notifier.get_rename_formspec(name)
+function notifier.get_formspec(name)
     local formspec = {
         "size[3,2]",
         "real_coordinates[true]",
