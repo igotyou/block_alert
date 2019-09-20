@@ -1,23 +1,36 @@
 --for lack of a better name...
 local player_alert_status = {}
 
+function dump(o)
+    if type(o) == 'table' then
+       local s = '{ '
+       for k,v in pairs(o) do
+          if type(k) ~= 'number' then k = '"'..k..'"' end
+          s = s .. '['..k..'] = ' .. dump(v) .. ','
+       end
+       return s .. '} '
+    else
+       return tostring(o)
+    end
+ end
+
 local function handle_player_entry_event(player, node_pos)
     local node_name = minetest.get_node(node_pos).name
+    minetest.chat_send_all("ENTER EVENT!")
     if(node_name == "block_alert:notifier") then
         notifier.handle_player_entry(player, node_pos)
     elseif node_name == "block_alert:recorder" then
     end
-    )
 end
 
 local function handle_player_exit_event(player, node_pos)
     local node_name = minetest.get_node(node_pos).name
+    
+    minetest.chat_send_all("EXIT EVENT!")
     if(node_name == "block_alert:notifier") then
-        minetest.chat_send_all("EXIT EVENT FOR NOTIFIER!")
     elseif node_name == "block_alert:recorder" then
 
     end
-    )
 end
 
 function util.check_permission(pos, pname)
@@ -41,35 +54,36 @@ end
 function util.find_nodes(center_pos, search_radius, block_type)
     local bound1 = vector.subtract(center_pos, {x = search_radius, y=search_radius , z= search_radius})
     local bound2 = vector.add(center_pos, {x = search_radius, y=search_radius , z= search_radius})
-    local nodeList = minetest.find_nodes_in_area(bound1, bound2, { block_type })
+    local nodeList = minetest.find_nodes_in_area(bound1, bound2, block_type)
     return nodeList
 end
 
 function util.check_new_player_move(player)
     local player_name = player:get_player_name()
     local old_alert_list = player_alert_status[player_name]
+    if old_alert_list == nil then old_alert_list = {} end
     local new_alert_list = util.find_nodes(player:get_pos(), 5, {"block_alert:notifier","block_alert:recorder"})
 
     local lookup_table_new = {}
     local lookup_table_old = {}
 
-    for _, node_pos in pairs(new_alert_list)
+    for _, node_pos in pairs(new_alert_list) do
         local string_pos = minetest.pos_to_string(node_pos)
         lookup_table_new[string_pos] = true
     end
 
     for _, node_pos in pairs(old_alert_list) do
-        local string = minetest.pos_to_string(node_pos)
-        if(lookup_table_new[string]==nil) then 
-            handle_player_entry_event(player)
+        local string_pos = minetest.pos_to_string(node_pos)
+        if(lookup_table_new[string_pos]==nil) then 
+            handle_player_exit_event(player, node_pos)
         end
-        lookup_table_old[string] = true
+        lookup_table_old[string_pos] = true
     end
 
-    for _, node_pos in pairs(new_alert_list)
+    for _, node_pos in pairs(new_alert_list) do
         local string_pos = minetest.pos_to_string(node_pos)
-        if(lookup_table_old[string]==nil) then
-            handle_player_exit_event(player)
+        if(lookup_table_old[string_pos]==nil) then
+            handle_player_entry_event(player, node_pos)
         end
     end
 
