@@ -8,7 +8,7 @@ end
 local function add_entry(recorder_pos, message)
     local log = get_log(recorder_pos)
     table.insert( log, 1,  message)
-    if table.getn(log) > 100 then table.remove(log) end
+    if table.getn(log) > 500 then table.remove(log) end
     local meta = minetest.get_meta(recorder_pos)
     meta:set_string("log", minetest.serialize(log))
     meta:mark_as_private("log")

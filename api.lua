@@ -1,5 +1,6 @@
 local playerLastPos = {}
 local playerRenamePos = {}
+local timer = 0
 
 minetest.register_node("block_alert:notifier",
 {
@@ -58,12 +59,16 @@ end)
 
 --This can be made muchhhhhh more efficient
 minetest.register_globalstep(function(dtime)
-    for _,player in ipairs(minetest.get_connected_players()) do
-        local lastPos = playerLastPos[player:get_player_name()]
-        if(lastPos and util.different_pos(lastPos, player:get_pos())) then
-            util.check_new_player_move(player)
+    timer = timer + dtime
+    if timer >= 0.5 then
+        for _,player in ipairs(minetest.get_connected_players()) do
+            local lastPos = playerLastPos[player:get_player_name()]
+            if(lastPos and util.different_pos(lastPos, player:get_pos())) then
+                util.check_new_player_move(player)
+            end
+            playerLastPos[player:get_player_name()] = player:get_pos()    
         end
-        playerLastPos[player:get_player_name()] = player:get_pos()    
+        timer = 0
     end
 end)
 
