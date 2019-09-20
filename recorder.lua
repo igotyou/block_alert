@@ -38,3 +38,8 @@ function recorder.handle_block_event(pos, node_name, player_name, event_type)
         end
     end
 end
+
+function recorder.handle_player_event(player, recorder_pos, event_type)
+    local messageString = os.date("[%d/%m %H:%M]") .. player:get_player_name() .. " " .. event_type
+    add_entry(recorder_pos, messageString)
+end

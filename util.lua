@@ -16,20 +16,19 @@ function dump(o)
 
 local function handle_player_entry_event(player, node_pos)
     local node_name = minetest.get_node(node_pos).name
-    minetest.chat_send_all("ENTER EVENT!")
     if(node_name == "block_alert:notifier") then
-        notifier.handle_player_entry(player, node_pos)
+        notifier.handle_player_event(player, node_pos, "entered")
     elseif node_name == "block_alert:recorder" then
+        recorder.handle_player_event(player,node_pos,"entered")
     end
 end
 
 local function handle_player_exit_event(player, node_pos)
     local node_name = minetest.get_node(node_pos).name
-    
-    minetest.chat_send_all("EXIT EVENT!")
     if(node_name == "block_alert:notifier") then
+        notifier.handle_player_event(player, node_pos, "exited")
     elseif node_name == "block_alert:recorder" then
-
+        recorder.handle_player_event(player,node_pos,"exited")
     end
 end
 
