@@ -6,6 +6,7 @@ minetest.register_node("block_alert:notifier",
 {
     description = "Notifier block.",
     tiles = {"^[colorize:#802BB1"},
+    groups = {choppy = 2, oddly_breakable_by_hand = 2, wood = 1},
 
     after_place_node  = function(pos, placer)
         local meta = minetest.get_meta(pos)
@@ -20,13 +21,14 @@ minetest.register_node("block_alert:notifier",
             playerRenamePos[pname] = pos
             minetest.show_formspec(pname, "block_alert:notifier_rename", notifier.get_formspec(meta:get_string("name")))            
         end
-    end,
+    end
 })
 
 minetest.register_node("block_alert:recorder",
 {
     description = "Recorder block.",
     tiles = {"^[colorize:#0000FF"},
+    groups = {choppy = 2, oddly_breakable_by_hand = 2, wood = 1},
 
     after_place_node  = function(pos, placer)
         local meta = minetest.get_meta(pos)
@@ -40,7 +42,7 @@ minetest.register_node("block_alert:recorder",
         if(util.check_permission(pos,pname)) then
             minetest.show_formspec(pname, "block_alert:recorder_log", recorder.get_formspec(pos))            
         end
-    end,
+    end
 })
 
 minetest.register_on_player_receive_fields(function(player, formname, fields)
