@@ -30,7 +30,7 @@ function recorder.get_formspec(recorder_pos)
 end
 
 function recorder.handle_block_event(pos, node_name, player_name, event_type)  
-    local recorders = util.find_nodes(pos, 5, "block_alert:recorder")
+    local recorders = util.find_nodes(pos, 5, {"block_alert:recorder"})
     if recorders then
         local message = os.date("[%d/%m %H:%M]") .. player_name .. " " .. event_type .." " .. node_name .. " at " .. minetest.pos_to_string(pos)
         for _,recorder_pos in ipairs(recorders) do

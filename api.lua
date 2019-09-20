@@ -61,10 +61,7 @@ minetest.register_globalstep(function(dtime)
     for _,player in ipairs(minetest.get_connected_players()) do
         local lastPos = playerLastPos[player:get_player_name()]
         if(lastPos and util.different_pos(lastPos, player:get_pos())) then
-            local notifierList = util.find_nodes(player:get_pos(), 5, "block_alert:notifier")
-            for _,nodePos in ipairs(notifierList) do
-                notifier.handle_player_entry(player,nodePos)
-            end
+            util.check_new_player_move(player)
         end
         playerLastPos[player:get_player_name()] = player:get_pos()    
     end

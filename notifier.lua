@@ -1,9 +1,9 @@
 local lastNotification = {} --This is used to avoid spamming
 
 local function get_seconds_since_last_notification(string)
-    if(lastNotification[string]) then 
-        return ((minetest.get_us_time() - lastNotification[string])/1000000.0) 
-    else 
+    if(lastNotification[string]) then
+        return ((minetest.get_us_time() - lastNotification[string])/1000000.0)
+    else
         return 60 --This is a arbitriaty large number
     end
 end
@@ -18,13 +18,13 @@ function notifier.get_formspec(name)
     return table.concat(formspec, "")
 end
 
-function notifier.handle_player_entry(player, pos)
-    local reinf = ct.get_reinforcement(pos)
+function notifier.handle_player_entry(player, node_pos)
+    local reinf = ct.get_reinforcement(node_pos)
     if reinf then
-        local meta = minetest.get_meta(pos)
-        local messageString = player:get_player_name() .. " entered " .. meta:get_string("name") .. " at " .. minetest.pos_to_string(pos)
+        local meta = minetest.get_meta(node_pos)
+        local messageString = player:get_player_name() .. " entered " .. meta:get_string("name") .. " at " .. minetest.pos_to_string(nodePos)
         local secondsSinceLast = get_seconds_since_last_notification(messageString)
-        if(secondsSinceLast > 10) then 
+        if(secondsSinceLast > 10) then
             pm.send_chat_group(reinf.ctgroup_id, messageString)
             lastNotification[messageString] = minetest.get_us_time()
         end
