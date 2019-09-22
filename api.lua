@@ -1,6 +1,4 @@
-local playerLastPos = {}
 local playerRenamePos = {}
-local timer = 0
 
 minetest.register_node("block_alert:notifier",
 {
@@ -59,21 +57,6 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
     end
 end)
 
---This can be made muchhhhhh more efficient
-minetest.register_globalstep(function(dtime)
-    timer = timer + dtime
-    if timer >= 0.5 then
-        for _,player in ipairs(minetest.get_connected_players()) do
-            local lastPos = playerLastPos[player:get_player_name()]
-            if(lastPos and util.different_pos(lastPos, player:get_pos())) then
-                util.check_new_player_move(player)
-            end
-            playerLastPos[player:get_player_name()] = player:get_pos()    
-        end
-        timer = 0
-    end
-end)
-
 minetest.register_on_placenode(function(pos, newnode, placer, oldnode, itemstack, pointed_thing)
     if placer and minetest.is_player(placer) then recorder.handle_block_event(pos, newnode.name, placer:get_player_name(), "placed") end
     return false
@@ -81,4 +64,8 @@ end)
 
 minetest.register_on_dignode(function(pos, oldnode, digger)
     if digger and minetest.is_player(digger) then recorder.handle_block_event(pos, oldnode.name, digger:get_player_name(), "broke") end
+end)
+
+pmutils.register_player_move(function(player,player_pos, player_last_pos)
+    util.check_new_player_move(player)
 end)

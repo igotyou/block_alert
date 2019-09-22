@@ -1,19 +1,6 @@
 --for lack of a better name...
 local player_alert_status = {}
 
-function dump(o)
-    if type(o) == 'table' then
-       local s = '{ '
-       for k,v in pairs(o) do
-          if type(k) ~= 'number' then k = '"'..k..'"' end
-          s = s .. '['..k..'] = ' .. dump(v) .. ','
-       end
-       return s .. '} '
-    else
-       return tostring(o)
-    end
- end
-
 local function handle_player_entry_event(player, node_pos)
     local node_name = minetest.get_node(node_pos).name
     if(node_name == "block_alert:notifier") then
@@ -40,14 +27,6 @@ function util.check_permission(pos, pname)
     else return true
     end
     return false
-end
-
-function util.different_pos(pos1,pos2)
-    if pos1.x ~= pos2.x then return true
-    elseif pos1.z ~= pos2.z then return true
-    elseif pos1.y ~= pos2.y then return true
-    else return false
-    end
 end
 
 function util.find_nodes(center_pos, search_radius, block_type)
