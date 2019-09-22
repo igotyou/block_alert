@@ -1,10 +1,12 @@
 local playerLastPos = {}
 local playerRenamePos = {}
+local timer = 0
 
 minetest.register_node("block_alert:notifier",
 {
     description = "Notifier block.",
     tiles = {"^[colorize:#802BB1"},
+    groups = {choppy = 2, oddly_breakable_by_hand = 2, wood = 1},
 
     after_place_node  = function(pos, placer)
         local meta = minetest.get_meta(pos)
@@ -19,13 +21,14 @@ minetest.register_node("block_alert:notifier",
             playerRenamePos[pname] = pos
             minetest.show_formspec(pname, "block_alert:notifier_rename", notifier.get_formspec(meta:get_string("name")))            
         end
-    end,
+    end
 })
 
 minetest.register_node("block_alert:recorder",
 {
     description = "Recorder block.",
     tiles = {"^[colorize:#0000FF"},
+    groups = {choppy = 2, oddly_breakable_by_hand = 2, wood = 1},
 
     after_place_node  = function(pos, placer)
         local meta = minetest.get_meta(pos)
@@ -39,7 +42,7 @@ minetest.register_node("block_alert:recorder",
         if(util.check_permission(pos,pname)) then
             minetest.show_formspec(pname, "block_alert:recorder_log", recorder.get_formspec(pos))            
         end
-    end,
+    end
 })
 
 minetest.register_on_player_receive_fields(function(player, formname, fields)
@@ -58,15 +61,16 @@ end)
 
 --This can be made muchhhhhh more efficient
 minetest.register_globalstep(function(dtime)
-    for _,player in ipairs(minetest.get_connected_players()) do
-        local lastPos = playerLastPos[player:get_player_name()]
-        if(lastPos and util.different_pos(lastPos, player:get_pos())) then
-            local notifierList = util.find_nodes(player:get_pos(), 5, "block_alert:notifier")
-            for _,nodePos in ipairs(notifierList) do
-                notifier.handle_player_entry(player,nodePos)
+    timer = timer + dtime
+    if timer >= 0.5 then
+        for _,player in ipairs(minetest.get_connected_players()) do
+            local lastPos = playerLastPos[player:get_player_name()]
+            if(lastPos and util.different_pos(lastPos, player:get_pos())) then
+                util.check_new_player_move(player)
             end
+            playerLastPos[player:get_player_name()] = player:get_pos()    
         end
-        playerLastPos[player:get_player_name()] = player:get_pos()    
+        timer = 0
     end
 end)
 

@@ -6,9 +6,10 @@ local function get_log(recorder_pos)
 end
 
 local function add_entry(recorder_pos, message)
+    message = os.date("[%Y-%m-%d %H:%M:%S] ") .. message
     local log = get_log(recorder_pos)
     table.insert( log, 1,  message)
-    if table.getn(log) > 100 then table.remove(log) end
+    if table.getn(log) > 500 then table.remove(log) end
     local meta = minetest.get_meta(recorder_pos)
     meta:set_string("log", minetest.serialize(log))
     meta:mark_as_private("log")
@@ -30,11 +31,16 @@ function recorder.get_formspec(recorder_pos)
 end
 
 function recorder.handle_block_event(pos, node_name, player_name, event_type)  
-    local recorders = util.find_nodes(pos, 5, "block_alert:recorder")
+    local recorders = util.find_nodes(pos, 5, {"block_alert:recorder"})
     if recorders then
-        local message = os.date("[%d/%m %H:%M]") .. player_name .. " " .. event_type .." " .. node_name .. " at " .. minetest.pos_to_string(pos)
+        local message = player_name .. " " .. event_type .." " .. node_name .. " at " .. minetest.pos_to_string(pos)
         for _,recorder_pos in ipairs(recorders) do
             add_entry(recorder_pos, message)
         end
     end
+end
+
+function recorder.handle_player_event(player, recorder_pos, event_type)
+    local messageString = player:get_player_name() .. " " .. event_type
+    add_entry(recorder_pos, messageString)
 end
