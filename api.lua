@@ -22,6 +22,17 @@ minetest.register_node("block_alert:notifier",
     end
 })
 
+minetest.register_craft({
+    type = "shaped",
+    output = "block_alert:notifier",
+    recipe = {
+        {"group:wood", "group:wood"     ,"group:wood"},
+        {"group:wood", "default:gold_ingot","group:wood"},
+        {"group:wood", "group:wood"     ,"group:wood"}
+    }
+})
+
+
 minetest.register_node("block_alert:recorder",
 {
     description = "Recorder block.",
@@ -41,6 +52,16 @@ minetest.register_node("block_alert:recorder",
             minetest.show_formspec(pname, "block_alert:recorder_log", recorder.get_formspec(pos))            
         end
     end
+})
+
+minetest.register_craft({
+    type = "shaped",
+    output = "block_alert:recorder",
+    recipe = {
+        {"group:wood", "group:wood"     ,"group:wood"},
+        {"group:wood", "default:diamond","group:wood"},
+        {"group:wood", "group:wood"     ,"group:wood"}
+    }
 })
 
 minetest.register_on_player_receive_fields(function(player, formname, fields)
