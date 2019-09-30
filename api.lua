@@ -87,6 +87,6 @@ minetest.register_on_dignode(function(pos, oldnode, digger)
     if digger and minetest.is_player(digger) then recorder.handle_block_event(pos, oldnode.name, digger:get_player_name(), "broke") end
 end)
 
-pmutils.register_player_move(function(player,player_pos, player_last_pos)
+pmutils.register_player_move(function(player, playerHistory)
     util.check_new_player_move(player)
 end)
