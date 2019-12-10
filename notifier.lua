@@ -27,9 +27,15 @@ end
 function notifier.handle_right_click(pos, clicker)
     local pname = clicker and clicker:get_player_name() or ""
     local meta = minetest.get_meta(pos)
+<<<<<<< HEAD
     if(util.check_permission(pos,pname)) then 
         playerRenamePos[pname] = pos
         minetest.show_formspec(pname, "block_alert:notifier_rename", get_formspec(meta:get_string("name")))            
+=======
+    if(util.check_permission(pos,pname)) then
+        playerRenamePos[pname] = pos
+        minetest.show_formspec(pname, "block_alert:notifier_rename", get_formspec(meta:get_string("name")))
+>>>>>>> Moved some code around
     end
 end
 
@@ -41,4 +47,8 @@ function notifier.handle_formspec_submission(player, fields)
             meta:set_string("name", fields.name)
         end
     end
+<<<<<<< HEAD
 end
+=======
+end
+>>>>>>> Moved some code around
